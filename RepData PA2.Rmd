@@ -1,0 +1,272 @@
+---
+##title: "Reproducible Research, Peer Assessment 2"
+##author: "DataRacer11"
+##date: "August 22, 2015"
+output: pdf_document
+---
+##NOAA Data: Severe Weather Events
+
+######(NOTE:The following published documentation has been designed to meet the requirements of on-line Coursera Course: Reproducible Research, Peer Assessment 2. References for this course and publication may be found at the end of this document.)
+
+##Synopsis
+
+####The following data analysis of the U.S. National Oceanic and Atmospheric Administration's (NOAA)   [Storm Data](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz)
+####is essential in aiding government and municipal managers. Data included has been analyzed to promote more effective preparation and prioritization of emergency resources in the case of severe weather 
+
+###Data analysis focus is two-fold:
+
+####1)	U.S. severe weather events or EVTYPE (i.e. EVent TYPE variables) highlights data while isolating the most severe weather. Such severe U.S. events includes thunderstorms, tornados and flooding. These have been described by NOAA as harmful to population health resulting in: a) injuries and b) fatalities.
+####2)	NOAA storm data has shown that U.S. greatest economic impact from severe weather events results in: a) property damage and b) crop damages.
+
+##Data Processing:
+
+####This section describes (in words and code) how NOAA's storm event database records (1950 to November 2011) were loaded into R and processed for analysis. 
+####-The data analysis starts from the raw .CSV file [Storm Data 47Mb](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2)
+####-No pre-processing occurs outside this document. 
+####-Data processing and analysis was conducted using R version (x64 3.2.1) within RStudio version (0.99.467). 
+
+###A step-wise approach for processing of NOAA storm data: 
+
+####Step 1: Exploration includes data preparation involving initial project preparation and set up in RStudio.
+####If you are new to RStudio the following instructions may prove helpful in creating a new Reproducible Research - Peer Assessment 2 Project in RStudio:
+
+####Execute a new project in RStudio (Available for Windows, Macs and Linux and  looks the same across all three operating systems):
+
+#####1. Click File >> New Project (by using the Project pull down menu in the upper right hand corner)
+#####2. Click Version
+#####3. Choose Git
+#####4. Enter URL for the Git Repository, as well as the folder where this may be cloned
+#####5. Type filename
+#####6. Clicking Tools >> Global Options brings up RStudio options settings
+
+####Set working directory in console pane in RStudio:
+#####1. Click Session >> Set Working Directory >> Choose Directory
+#####2. In Console pane > getwd() to ensure the working directory is correct
+
+####Create a new R file:
+##### Click File >> New File >> R Script
+
+####Install R Packages: 
+#####1. Click Packages on the pane layout tab
+#####2. Click Install on the pane layout tab
+#####3. Type package name under Packages
+#####4. Click Install 
+
+####Load libraries into R console:
+
+####library(knitr)
+####library(R.utils)
+####library(dplyr)
+####library(stringr)
+
+####Step 2: Data sets with large numbers of variables require preliminary selection operations to bring the number of variables into a manageable range.Justification for selecting subsets of storm data records focuses on NOAA two quantifiable variables: FATALITIES and INJURIES.
+####- The raw NOAA Storm dataset consists of a .csv file compressed via [bzip2](www.bzip.org/) which may be downloaded from the web.  
+
+####- Additional documentation about this dataset includes:
+
+####[National Weather Service Documentation](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2Fpd01016005curr.pdf)  
+
+####[National Climatic Data Center Storm Events](https://d396qusza40orc.cloudfront.net/repdata%2Fpeer2_doc%2FNCDC%20Storm%20Even####ts-FAQ%20Page.pdf) 
+
+####Download [Storm Data](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2 to the #### working directory): 
+- Move dataset to the R working directory. 
+- Click the Environment tab >> Import dataset >> from the working directory which will import the raw data file.
+- The resulting raw .csv data file is 409.4 MB including 902,297 entries
+or objects with 37 variables.
+ 
+####- Read raw dataset into memory in RStudio by selecting the Environment tab and importing the dataset from the working directory:
+
+```{r}
+data <- read.csv("repdata-data-StormData.csv.bz2", header=TRUE, na.strings = "")
+```
+####- Time-consuming pre-processing can utilize the cache = TRUE option for certain code chunks.
+
+```{r}
+cache = TRUE
+```
+
+```{r}
+dim(data)
+```
+####- The head function will print several row for a preliminary view of the of the dataset:
+
+```{r}
+head(data)
+```
+
+```{r}
+length(unique(data$EVTYPE))
+```
+
+####- According to the [NOAA website](http://www.ncdc.noaa.gov/stormevents/details.jsp?type=eventtype) 
+
+####- The most relevant, unbiased data to meet our focused objective on events causing the greatest risk to population health begins in 1996.
+
+####- There are 48 event types that will be reviewed to bring the number of variables into a manageable range.
+
+####- Filter the raw data down (1996 to November 2011).
+
+####- Select only the focused NOAA data above on two quantifiable variables: FATALITIES and INJURIES.
+
+####- Identify the various weather event types recorded in the NOAA Storm dataset. 
+
+```{r}
+harmful_event_data <- filter(data, as.numeric(format(as.Date(as.character(data$BGN_DATE), "%m/%d/%Y %H:%M:%S"), "%Y")) >= 1996)
+```
+
+```{r}
+dim(harmful_event_data)
+
+```
+
+```{r}
+colnames(data)
+```
+
+#### Most Relevant Variable and Descriptions:
+
+#####STATE: State events took place
+
+#####EVTYPE: Event Type (e.g. tornado, flood, etc.)
+
+#####FATALITIES: Number of fatalities
+
+#####INJURIES:Number of injuries
+
+#####PROPDMG:Property damage estimates, entered as actual dollar amounts
+
+#####PROPDMGEXP:Alphabetic Codes to signify magnitude "K" for thousands, "M" for millions, and "B" for billions)
+
+#####CROPDMG:Crop damage estimates, entered as actual dollar amounts
+
+#####CROPDMGEXP:Alphabetic Codes to signify magnitude "K" for thousands, "M" for millions, and "B" for billions),
+
+####- Out of the 48 event types FATALITIES and INJURIES are the most relevant to population health for determining a severe event focus.
+
+##Results
+
+####Step 3: The next stage of the process is to identify the most relevant event variables: Focus on FATALITIES and INJURIES to pair these variables with the greatest economic impact variables. Economic impact is quantified with variables PROPDMG, PROPDMGEXP, CROPDMG, and CROPDMGEXP.
+
+####-Transforming the data to more easily quantify the economic impact of each variable; PROPDMG, PROPDMGEXP, CROPDMG, and CROPDMGEXP is important to plot the economic impact and provide evaluators of the data the information they require for deploying specific resources to meet specific severe weather events. 
+
+####-The following will help to plot Property Damage and Quantify Economic Impact 
+
+```{r}
+  data$p_DMGEXP <- 1
+      data$p_DMGEXP  [data$PROPDMGEXP == "K" | data$PROPDMGEXP == "k"] <- 1000
+      data$p_DMGEXP  [data$PROPDMGEXP == "M" | data$PROPDMGEXP == "m"] <- 1000000
+      data$p_DMGEXP  [data$PROPDMGEXP == "B" | data$PROPDMGEXP == "b"] <- 1000000000
+      data$p <- data$PROPDMG * data$p_DMGEXP
+```
+####- The following will help to plot Crop Damage to show Quantify Economic Impact 
+
+```{r}
+  data$c_DMGEXP <- 1
+    data$c_DMGEXP [data$CROPDMGEXP == "K" | data$CROPDMGEXP == "k"] <-  1000
+    data$c_DMGEXP [data$CROPDMGEXP == "M" | data$CROPDMGEXP == "m"] <-  1000000
+    data$c_DMGEXP [data $CROPDMGEXP == "B" | data$CROPDMGEXP == "b"] <- 1000000000
+    data$c <- data$CROPDMG * data$c_DMGEXP
+```
+####- The focus is on  aggregating the FATALITIES and INJURIES variables with severe harmful events to population health and greatest economic impact.
+
+```{r}
+  harmfulE <- aggregate(x = data[,c("FATALITIES", "INJURIES")], 
+    by = list(data$EVTYPE), FUN = "sum")
+  names(harmfulE) <- c("event", "fatalities", "injuries")
+  event1 <- head(harmfulE[order(-harmfulE$fatalities,harmfulE$injuries),"event"],1)
+```
+
+```{r}
+  harmful_event <- data[data$EVTYPE == event1,]
+  harmful_event_state <- aggregate(x = harmful_event
+    [,c("FATALITIES", "INJURIES")], by = list(harmful_event$STATE), FUN = "sum")
+    names(harmful_event_state) <- c("state", "fatalities", "injuries")
+    stormE <- aggregate(x = data[,c("p", "c")], by = list(data$EVTYPE), FUN = "sum")
+```
+
+```{r}
+  stormE <- aggregate(x = data[,c("p", "c")], by = list(data$EVTYPE), FUN = "sum")
+  names(stormE) <- c("event", "propdam", "cropdam")
+  event2 <- head(stormE[order(-stormE$propdam, - stormE$cropdam),"event"],1)
+```
+
+```{r}
+  se_event <- data[data$EVTYPE == event1,]
+  se_state <- aggregate(x = se_event[,c("p", "c")], by = list(se_event$STATE), 
+    FUN = "sum")
+  names(se_state) <- c("state", "propdam", "cropdam")
+  harmfulE <- head(harmfulE[order(-harmfulE$fatalities, - harmfulE$injuries),],10)
+```
+
+```{r}
+  harmfulE$event <- as.factor(as.character(harmfulE$event))
+```
+
+####- Plot Severe and Harmful Events:
+
+```{r}
+  plot(harmfulE$event 
+    ,harmfulE$fatalities
+    ,type = "b"
+    ,main = "U.S. Events Most Harmful to Population Health"
+    ,xlab = "Type of Severe Events"
+    ,ylab = "Number of Fatalities")
+```
+
+```{r}
+harmfulE
+```
+
+```{r}
+as.character(event1)
+```
+
+```{r}
+head(harmful_event_state [order(-harmful_event_state $fatalities, harmful_event_state $injuries),],10)
+```
+
+```{r}
+stormE_most_harmful <- head(stormE[order(-stormE$propdam, -stormE$cropdam),],10)
+```
+
+```{r}
+stormE_most_harmful$event <- as.factor(as.character(stormE_most_harmful$event))
+```
+
+####Plot Severe Events Most Harmful to U.S. Economy:
+```{r}
+plot(stormE_most_harmful$event
+       ,stormE_most_harmful$propdam / 1000000000
+       ,type = "b"
+       ,main = "Severe Events Most Harmful to U.S. Economy"
+       ,xlab = "Type of Severe Events"
+       ,ylab = "Property Damage (Billions)")
+```
+
+```{r}
+stormE_most_harmful
+```
+
+```{r}
+as.character(event2)
+```
+
+```{r}
+head(se_state[order(-se_state$propdam,-se_state$cropdam),],20)
+  
+```
+####- In the final results step, "Why is it is important to plot data which aids government and municipal managers in the deployment of emergency resources due to severe storms?" These data help to promote proper preparedness for lowering the risk of injuries and fatalities due to severe storms and flooding. In turn, preparedness may lead to lowering risk of property and crop damages and greater economic U.S. success.
+
+#####_References:_
+
+#####1.	"Reproducible Research", by Roger D. Peng, PhD, Jeff Leek, PhD, Brian Caffo, PhD, Coursera. July 11, 2014.https://www.coursera.org/course/repdata
+#####2.	"A Few Simple Plots in R", by Keith Helfrich. July 29, 2014. http://redheadedstepdata.io/a-few-simple-plots-in-R/
+#####3.	"repData_project2.rmd - Reproducible Code", by Keith Helfrich. July 25, 2014. https://www.dropbox.com/s/zci6m2x97zywkx6/repData_project2.rmd
+#####4.	"National Weather Service Storm Data Documentation". July 29, 2014 https://d396qusza40orc.cloudfront.net repdata/peer2_doc/pd01016005curr.pdf
+######5.	"National Climatic Data Center Storm Events FAQ". July 29, 2014. https://d396qusza40orc.cloudfront.net/repdata/peer2_doc/NCDC%20Storm%20Events-FAQ%20Page.pdf
+
+
+
+
+
+
