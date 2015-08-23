@@ -1,12 +1,3 @@
----
-##title: "Reproducible Research, Peer Assessment 2"
-##author: "DataRacer11"
-##date: "August 22, 2015"
-output: 
-  html_document: 
-    fig_caption: yes
-    keep_md: yes
----
 ##NOAA Data: Severe Weather Events
 
 ######(NOTE:The following published documentation has been designed to meet the requirements of on-line Coursera Course: Reproducible Research, Peer Assessment 2. References for this course and publication may be found at the end of this document.)
@@ -79,26 +70,77 @@ or objects with 37 variables.
  
 ####- Read raw dataset into memory in RStudio by selecting the Environment tab and importing the dataset from the working directory:
 
-```{r}
+
+```r
 data <- read.csv("repdata-data-StormData.csv.bz2", header=TRUE, na.strings = "")
 ```
 ####- Time-consuming pre-processing can utilize the cache = TRUE option for certain code chunks.
 
-```{r}
+
+```r
 cache = TRUE
 ```
 
-```{r}
+
+```r
 dim(data)
+```
+
+```
+## [1] 902297     37
 ```
 ####- The head function will print several row for a preliminary view of the of the dataset:
 
-```{r}
+
+```r
 head(data)
 ```
 
-```{r}
+```
+##   STATE__           BGN_DATE BGN_TIME TIME_ZONE COUNTY COUNTYNAME STATE
+## 1       1  4/18/1950 0:00:00     0130       CST     97     MOBILE    AL
+## 2       1  4/18/1950 0:00:00     0145       CST      3    BALDWIN    AL
+## 3       1  2/20/1951 0:00:00     1600       CST     57    FAYETTE    AL
+## 4       1   6/8/1951 0:00:00     0900       CST     89    MADISON    AL
+## 5       1 11/15/1951 0:00:00     1500       CST     43    CULLMAN    AL
+## 6       1 11/15/1951 0:00:00     2000       CST     77 LAUDERDALE    AL
+##    EVTYPE BGN_RANGE BGN_AZI BGN_LOCATI END_DATE END_TIME COUNTY_END
+## 1 TORNADO         0    <NA>       <NA>     <NA>     <NA>          0
+## 2 TORNADO         0    <NA>       <NA>     <NA>     <NA>          0
+## 3 TORNADO         0    <NA>       <NA>     <NA>     <NA>          0
+## 4 TORNADO         0    <NA>       <NA>     <NA>     <NA>          0
+## 5 TORNADO         0    <NA>       <NA>     <NA>     <NA>          0
+## 6 TORNADO         0    <NA>       <NA>     <NA>     <NA>          0
+##   COUNTYENDN END_RANGE END_AZI END_LOCATI LENGTH WIDTH F MAG FATALITIES
+## 1         NA         0    <NA>       <NA>   14.0   100 3   0          0
+## 2         NA         0    <NA>       <NA>    2.0   150 2   0          0
+## 3         NA         0    <NA>       <NA>    0.1   123 2   0          0
+## 4         NA         0    <NA>       <NA>    0.0   100 2   0          0
+## 5         NA         0    <NA>       <NA>    0.0   150 2   0          0
+## 6         NA         0    <NA>       <NA>    1.5   177 2   0          0
+##   INJURIES PROPDMG PROPDMGEXP CROPDMG CROPDMGEXP  WFO STATEOFFIC ZONENAMES
+## 1       15    25.0          K       0       <NA> <NA>       <NA>      <NA>
+## 2        0     2.5          K       0       <NA> <NA>       <NA>      <NA>
+## 3        2    25.0          K       0       <NA> <NA>       <NA>      <NA>
+## 4        2     2.5          K       0       <NA> <NA>       <NA>      <NA>
+## 5        2     2.5          K       0       <NA> <NA>       <NA>      <NA>
+## 6        6     2.5          K       0       <NA> <NA>       <NA>      <NA>
+##   LATITUDE LONGITUDE LATITUDE_E LONGITUDE_ REMARKS REFNUM
+## 1     3040      8812       3051       8806    <NA>      1
+## 2     3042      8755          0          0    <NA>      2
+## 3     3340      8742          0          0    <NA>      3
+## 4     3458      8626          0          0    <NA>      4
+## 5     3412      8642          0          0    <NA>      5
+## 6     3450      8748          0          0    <NA>      6
+```
+
+
+```r
 length(unique(data$EVTYPE))
+```
+
+```
+## [1] 985
 ```
 
 ####- According to the [NOAA website](http://www.ncdc.noaa.gov/stormevents/details.jsp?type=eventtype) 
@@ -113,17 +155,34 @@ length(unique(data$EVTYPE))
 
 ####- Identify the various weather event types recorded in the NOAA Storm dataset. 
 
-```{r}
+
+```r
 harmful_event_data <- filter(data, as.numeric(format(as.Date(as.character(data$BGN_DATE), "%m/%d/%Y %H:%M:%S"), "%Y")) >= 1996)
 ```
 
-```{r}
-dim(harmful_event_data)
 
+```r
+dim(harmful_event_data)
 ```
 
-```{r}
+```
+## [1] 902297     37
+```
+
+
+```r
 colnames(data)
+```
+
+```
+##  [1] "STATE__"    "BGN_DATE"   "BGN_TIME"   "TIME_ZONE"  "COUNTY"    
+##  [6] "COUNTYNAME" "STATE"      "EVTYPE"     "BGN_RANGE"  "BGN_AZI"   
+## [11] "BGN_LOCATI" "END_DATE"   "END_TIME"   "COUNTY_END" "COUNTYENDN"
+## [16] "END_RANGE"  "END_AZI"    "END_LOCATI" "LENGTH"     "WIDTH"     
+## [21] "F"          "MAG"        "FATALITIES" "INJURIES"   "PROPDMG"   
+## [26] "PROPDMGEXP" "CROPDMG"    "CROPDMGEXP" "WFO"        "STATEOFFIC"
+## [31] "ZONENAMES"  "LATITUDE"   "LONGITUDE"  "LATITUDE_E" "LONGITUDE_"
+## [36] "REMARKS"    "REFNUM"
 ```
 
 #### Most Relevant Variable and Descriptions:
@@ -154,7 +213,8 @@ colnames(data)
 
 ####-The following will help to plot Property Damage and Quantify Economic Impact 
 
-```{r}
+
+```r
 data$p_DMGEXP <- 1
 data$p_DMGEXP  [data$PROPDMGEXP == "K" | data$PROPDMGEXP == "k"] <- 1000
 data$p_DMGEXP  [data$PROPDMGEXP == "M" | data$PROPDMGEXP == "m"] <- 1000000
@@ -163,7 +223,8 @@ data$p <- data$PROPDMG * data$p_DMGEXP
 ```
 ####- The following will help to plot Crop Damage to show Quantify Economic Impact 
 
-```{r}
+
+```r
 data$c_DMGEXP <- 1
 data$c_DMGEXP [data$CROPDMGEXP == "K" | data$CROPDMGEXP == "k"] <-  1000
 data$c_DMGEXP [data$CROPDMGEXP == "M" | data$CROPDMGEXP == "m"] <-  1000000
@@ -172,14 +233,16 @@ data$c <- data$CROPDMG * data$c_DMGEXP
 ```
 ####- The focus is on  aggregating the FATALITIES and INJURIES variables with severe harmful events to population health and greatest economic impact.
 
-```{r}
+
+```r
 harmfulE <- aggregate(x = data[,c("FATALITIES", "INJURIES")], 
 by = list(data$EVTYPE), FUN = "sum")
 names(harmfulE) <- c("event", "fatalities", "injuries")
 event1 <- head(harmfulE[order(-harmfulE$fatalities,harmfulE$injuries),"event"],1)
 ```
 
-```{r}
+
+```r
 harmful_event <- data[data$EVTYPE == event1,]
 harmful_event_state <- aggregate(x = harmful_event
 [,c("FATALITIES", "INJURIES")], by = list(harmful_event$STATE), FUN = "sum")
@@ -187,13 +250,15 @@ names(harmful_event_state) <- c("state", "fatalities", "injuries")
 stormE <- aggregate(x = data[,c("p", "c")], by = list(data$EVTYPE), FUN = "sum")
 ```
 
-```{r}
+
+```r
 stormE <- aggregate(x = data[,c("p", "c")], by = list(data$EVTYPE), FUN = "sum")
 names(stormE) <- c("event", "propdam", "cropdam")
 event2 <- head(stormE[order(-stormE$propdam, - stormE$cropdam),"event"],1)
 ```
 
-```{r}
+
+```r
 se_event <- data[data$EVTYPE == event1,]
 se_state <- aggregate(x = se_event[,c("p", "c")], by = list(se_event$STATE), 
 FUN = "sum")
@@ -201,13 +266,15 @@ names(se_state) <- c("state", "propdam", "cropdam")
 harmfulE <- head(harmfulE[order(-harmfulE$fatalities, - harmfulE$injuries),],10)
 ```
 
-```{r}
+
+```r
 harmfulE$event <- as.factor(as.character(harmfulE$event))
 ```
 
 ####- Plot Severe and Harmful Events:
 
-```{r}
+
+```r
 plot(harmfulE$event 
     ,harmfulE$fatalities
     ,type = "b"
@@ -216,28 +283,68 @@ plot(harmfulE$event
     ,ylab = "Number of Fatalities")
 ```
 
-```{r}
+![](RepData_PA2_files/figure-html/unnamed-chunk-16-1.png) 
+
+
+```r
 harmfulE
 ```
 
-```{r}
+```
+##              event fatalities injuries
+## 834        TORNADO       5633    91346
+## 130 EXCESSIVE HEAT       1903     6525
+## 153    FLASH FLOOD        978     1777
+## 275           HEAT        937     2100
+## 464      LIGHTNING        816     5230
+## 856      TSTM WIND        504     6957
+## 170          FLOOD        470     6789
+## 585    RIP CURRENT        368      232
+## 359      HIGH WIND        248     1137
+## 19       AVALANCHE        224      170
+```
+
+
+```r
 as.character(event1)
 ```
 
-```{r}
+```
+## [1] "TORNADO"
+```
+
+
+```r
 head(harmful_event_state [order(-harmful_event_state $fatalities, harmful_event_state $injuries),],10)
 ```
 
-```{r}
+```
+##    state fatalities injuries
+## 2     AL        617     7929
+## 45    TX        538     8207
+## 26    MS        450     6244
+## 25    MO        388     4330
+## 3     AR        379     5116
+## 44    TN        368     4748
+## 37    OK        296     4829
+## 16    IN        252     4224
+## 23    MI        243     3362
+## 17    KS        236     2721
+```
+
+
+```r
 stormE_most_harmful <- head(stormE[order(-stormE$propdam, -stormE$cropdam),],10)
 ```
 
-```{r}
+
+```r
 stormE_most_harmful$event <- as.factor(as.character(stormE_most_harmful$event))
 ```
 
 ####Plot Severe Events Most Harmful to U.S. Economy:
-```{r}
+
+```r
 plot(stormE_most_harmful$event
        ,stormE_most_harmful$propdam / 1000000000
        ,type = "b"
@@ -246,17 +353,63 @@ plot(stormE_most_harmful$event
        ,ylab = "Property Damage (Billions)")
 ```
 
-```{r}
+![](RepData_PA2_files/figure-html/unnamed-chunk-22-1.png) 
+
+
+```r
 stormE_most_harmful
 ```
 
-```{r}
+```
+##                 event      propdam    cropdam
+## 170             FLOOD 144657709807 5661968450
+## 411 HURRICANE/TYPHOON  69305840000 2607872800
+## 834           TORNADO  56937160779  414953270
+## 670       STORM SURGE  43323536000       5000
+## 153       FLASH FLOOD  16140812067 1421317100
+## 244              HAIL  15732267048 3025954473
+## 402         HURRICANE  11868319010 2741910000
+## 848    TROPICAL STORM   7703890550  678346000
+## 972      WINTER STORM   6688497251   26944000
+## 359         HIGH WIND   5270046295  638571300
+```
+
+
+```r
 as.character(event2)
 ```
 
-```{r}
+```
+## [1] "FLOOD"
+```
+
+
+```r
 head(se_state[order(-se_state$propdam,-se_state$cropdam),],20)
-  
+```
+
+```
+##    state    propdam  cropdam
+## 2     AL 6321296560 56797500
+## 25    MO 4800631725 22266000
+## 45    TX 3720855840 81889100
+## 37    OK 3268708233 50556550
+## 11    GA 3261026670 10785500
+## 17    KS 2669890670 12275000
+## 16    IN 2594793890   516000
+## 3     AR 2590007310  1507010
+## 26    MS 2441964530 54135000
+## 13    IA 2286576200  5611110
+## 36    OH 2279857790  5383500
+## 24    MN 1903701140 13196050
+## 39    PA 1789038400  7129000
+## 15    IL 1770413942  2296100
+## 10    FL 1751156593   148500
+## 30    NE 1718164710 27545750
+## 28    NC 1551333680  4437000
+## 44    TN 1541799890  2679000
+## 19    LA 1179366890  3843000
+## 23    MI 1071765550  1513000
 ```
 ####- In the final results step, "Why is it is important to plot data which aids government and municipal managers in the deployment of emergency resources due to severe storms?" These data help to promote proper preparedness for lowering the risk of injuries and fatalities due to severe storms and flooding. In turn, preparedness may lead to lowering risk of property and crop damages and greater economic U.S. success.
 
